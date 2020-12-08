@@ -14,23 +14,26 @@ use Laminas\Hydrator\ObjectProperty;
 use Laminas\Hydrator\ObjectPropertyHydrator;
 use LaminasTest\ApiTools\Hal\Plugin\TestAsset;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @subpackage UnitTest
  */
 class EntityExtractorTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var string */
     private $hydratorClass;
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->hydratorClass = class_exists(ObjectPropertyHydrator::class)
+        $this->hydratorClass = \class_exists(ObjectPropertyHydrator::class)
             ? ObjectPropertyHydrator::class
             : ObjectProperty::class;
     }
 
-    public function testExtractGivenEntityWithAssociateHydratorShouldExtractData()
+    public function testExtractGivenEntityWithAssociateHydratorShouldExtractData(): void
     {
         $hydrator = new $this->hydratorClass();
 
@@ -40,10 +43,10 @@ class EntityExtractorTest extends TestCase
 
         $extractor = new EntityExtractor($entityHydratorManager->reveal());
 
-        $this->assertSame($extractor->extract($entity), $hydrator->extract($entity));
+        self::assertSame($extractor->extract($entity), $hydrator->extract($entity));
     }
 
-    public function testExtractGivenEntityWithoutAssociateHydratorShouldExtractPublicProperties()
+    public function testExtractGivenEntityWithoutAssociateHydratorShouldExtractPublicProperties(): void
     {
         $entity = new TestAsset\Entity('foo', 'Foo Bar');
         $entityHydratorManager = $this->prophesize(EntityHydratorManager::class);
@@ -52,12 +55,12 @@ class EntityExtractorTest extends TestCase
         $extractor = new EntityExtractor($entityHydratorManager->reveal());
         $data = $extractor->extract($entity);
 
-        $this->assertArrayHasKey('id', $data);
-        $this->assertArrayHasKey('name', $data);
-        $this->assertArrayNotHasKey('doNotExportMe', $data);
+        self::assertArrayHasKey('id', $data);
+        self::assertArrayHasKey('name', $data);
+        self::assertArrayNotHasKey('doNotExportMe', $data);
     }
 
-    public function testExtractTwiceGivenSameEntityShouldProcessExtractionOnceAndReturnSameData()
+    public function testExtractTwiceGivenSameEntityShouldProcessExtractionOnceAndReturnSameData(): void
     {
         $entity = new TestAsset\Entity('foo', 'Foo Bar');
         $entityHydratorManager = $this->prophesize(EntityHydratorManager::class);
@@ -68,6 +71,6 @@ class EntityExtractorTest extends TestCase
         $data1 = $extractor->extract($entity);
         $data2 = $extractor->extract($entity);
 
-        $this->assertSame($data1, $data2);
+        self::assertSame($data1, $data2);
     }
 }

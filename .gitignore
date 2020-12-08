@@ -2,3 +2,4 @@
 /composer.lock
 /coveralls-upload.json
 /vendor/
+.phpunit.result.cache
